@@ -1,4 +1,4 @@
-# 🏥 SWASTH SAATHI
+# SWASTH SAATHI
 
 ### Network-Adaptive Clinical Decision Support System for Rural Healthcare
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - Problem Statement
 - Our Solution
@@ -19,7 +19,7 @@
 
 ---
 
-## 🎯 Problem Statement
+## Problem Statement
 
 Telemedicine Platform with Smart Symptom Checker | Domain: Healthcare
 
@@ -33,7 +33,7 @@ Challenge: Build a system that provides healthcare guidance regardless of intern
 
 ---
 
-## 💡 Our Solution
+## Our Solution
 
 SWASTH SAATHI is a Network-Adaptive Clinical Decision Support System that:
 
@@ -46,7 +46,7 @@ Healthcare access should NOT disappear when the internet does.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 For Patients:
 - Voice/Text/Icon Symptom Input - Works in local languages
@@ -66,7 +66,7 @@ Technical:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 Frontend: Next.js 14 (PWA) + TailwindCSS
 Offline Storage: Dexie.js (IndexedDB wrapper)
@@ -78,7 +78,7 @@ PWA: next-pwa (Service Workers)
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 Symptom Input --> Network Detect --> Triage Engine --> Doctor Review --> Care Pathway
                         |
@@ -89,7 +89,7 @@ Symptom Input --> Network Detect --> Triage Engine --> Doctor Review --> Care Pa
 
 ---
 
-## 🚀 Installation
+## Installation
 
 Prerequisites:
 - Node.js 18+
@@ -128,7 +128,7 @@ uvicorn main:app --reload
 
 ---
 
-## 📖 Usage
+## Usage
 
 Patient Flow:
 1. Open App - Select language
@@ -144,7 +144,7 @@ Doctor Flow:
 4. Validate - Approve or modify recommendation
 
 
-## 🔬 Research Validation
+## Research Validation
 
 80% telemedicine failure due to connectivity - WHO Digital Health Report, 2019
 51.7% cite distance as barrier - National Health Mission, 2022
@@ -153,7 +153,7 @@ Doctor Flow:
 
 ---
 
-## 🛡️ Compliance
+## Compliance
 
 - CDSS Framing - Clinical Decision Support, not diagnosis
 - Doctor-in-the-Loop - Human validates all recommendations
@@ -162,7 +162,7 @@ Doctor Flow:
 
 ---
 
-## 👥 Team
+## Team
 
 Harshal Jaiswal 
 Samarth Randive
@@ -173,7 +173,7 @@ Yash Deshmukh
 ---
 
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Ayushman Bharat Digital Mission (ABDM)
 - Ministry of Health and Family Welfare (MoHFW)
