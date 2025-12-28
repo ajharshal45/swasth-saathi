@@ -1,8 +1,13 @@
+
 # SWASTH SAATHI
 
-### Network-Adaptive Clinical Decision Support System for Rural Healthcare
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+>>>>>>> fd85f63ac49c6a1e2942906d222b38552bc8e766
 
-> "Intelligence adapts. Healthcare never stops."
+## Getting Started
+
+First, run the development server:
+
 
 ---
 
@@ -109,41 +114,44 @@ cd frontend
 npm install
 
 # Run development server
+=======
+```bash
+>>>>>>> fd85f63ac49c6a1e2942906d222b38552bc8e766
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-Backend Setup:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-# Navigate to backend
-cd backend
+You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-# Install dependencies
-pip install -r requirements.txt
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
 
-# Run server
-uvicorn main:app --reload
+This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
----
+## Learn More
 
+<<<<<<< HEAD
 ## Usage
+=======
+To learn more about Next.js, take a look at the following resources:
+>>>>>>> fd85f63ac49c6a1e2942906d222b38552bc8e766
 
-Patient Flow:
-1. Open App - Select language
-2. Check Symptoms - Voice/Text/Icon input
-3. Answer Questions - Age, duration, conditions
-4. Get Result - Urgency level (Low / Medium / High)
-5. Follow Pathway - Day-by-day care instructions
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
 
-Doctor Flow:
-1. Login - Access dashboard
-2. View Cases - See pre-triaged patients
-3. Review - Check AI reasoning
-4. Validate - Approve or modify recommendation
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Deploy on Vercel
 
+<<<<<<< HEAD
 ## Research Validation
 
 80% telemedicine failure due to connectivity - WHO Digital Health Report, 2019
@@ -185,3 +193,8 @@ Yash Deshmukh
 Made with love for Rural India
 
 SWASTH SAATHI - Intelligence adapts. Healthcare never stops.
+=======
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+>>>>>>> fd85f63ac49c6a1e2942906d222b38552bc8e766
