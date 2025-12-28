@@ -116,6 +116,18 @@ export default function Home() {
           🩺 {text.button}
         </button>
 
+        {/* Offline Mode Indicator */}
+        {!isOnline && (
+          <div className="mt-4 bg-amber-100 text-amber-800 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+            <span>📴</span>
+            <span>
+              {language === 'en' 
+                ? 'Offline mode - Basic features available' 
+                : 'ऑफ़लाइन मोड - बुनियादी सुविधाएं उपलब्ध'}
+            </span>
+          </div>
+        )}
+
         <p className="mt-6 text-sm text-gray-500">
           {text.offlineNote}
         </p>
