@@ -42,6 +42,42 @@ const withPWA = require('next-pwa')({
       },
     },
     {
+      // Cache questions page
+      urlPattern: /^\/questions$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 24 * 60 * 60,
+        },
+      },
+    },
+    {
+      // Cache result page
+      urlPattern: /^\/result$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 24 * 60 * 60,
+        },
+      },
+    },
+    {
+      // Cache pathway page
+      urlPattern: /^\/pathway$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 24 * 60 * 60,
+        },
+      },
+    },
+    {
       // Cache all Next.js static assets (JS, CSS chunks)
       urlPattern: /\/_next\/static\/.*/,
       handler: 'CacheFirst',
