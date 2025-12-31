@@ -1,0 +1,118 @@
+{
+  "infection": {
+    "priority": 2,
+    "symptoms": [
+      "fever",
+      "cold",
+      "cough",
+      "soreThroat",
+      "runnyNose",
+      "chills",
+      "lossSmell",
+      "lossTaste"
+    ]
+  },
+
+  "digestive": {
+    "priority": 2,
+    "symptoms": [
+      "stomach",
+      "vomiting",
+      "diarrhea",
+      "nausea",
+      "constipation",
+      "bloating",
+      "acidReflux",
+      "heartburn",
+      "lossAppetite"
+    ]
+  },
+
+  "breathing": {
+    "priority": 3,
+    "symptoms": [
+      "breathing",
+      "chestTightness",
+      "palpitations"
+    ]
+  },
+
+  "pain": {
+    "priority": 1,
+    "symptoms": [
+      "headache",
+      "bodyPain",
+      "jointPain",
+      "musclePain",
+      "backPain",
+      "neckPain",
+      "legPain",
+      "toothPain",
+      "earPain"
+    ]
+  },
+
+  "urinary": {
+    "priority": 2,
+    "symptoms": [
+      "burningUrine",
+      "frequentUrine",
+      "darkUrine"
+    ]
+  },
+
+  "skin": {
+    "priority": 1,
+    "symptoms": [
+      "rash",
+      "itching",
+      "drySkin"
+    ]
+  },
+
+  "neuro": {
+    "priority": 3,
+    "symptoms": [
+      "dizziness",
+      "confusion",
+      "tremors",
+      "blurredVision",
+      "anxiety",
+      "lowMood"
+    ]
+  },
+
+  "general": {
+    "priority": 1,
+    "symptoms": [
+      "weakness",
+      "fatigue",
+      "sleepIssues",
+      "excessSweating",
+      "coldHands"
+    ]
+  },
+
+  "eye": {
+    "priority": 1,
+    "symptoms": [
+      "eyePain",
+      "eyeRedness"
+    ]
+  },
+
+  "ear": {
+    "priority": 1,
+    "symptoms": [
+      "hearingIssue"
+    ]
+  },
+
+  "weight": {
+    "priority": 2,
+    "symptoms": [
+      "weightLoss",
+      "weightGain"
+    ]
+  }
+}

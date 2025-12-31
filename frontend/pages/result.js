@@ -1,79 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-// Triage logic function
-function getTriage(symptoms, ageGroup, duration, hasCondition, severity, medicineTaken) {
-  // ════════════════════════════════════════════════════════
-  // HIGH RISK (Needs urgent attention)
-  // ════════════════════════════════════════════════════════
+import { runTriage } from "../data/triage";
 
-  // Rule 1: Breathing issue - ALWAYS HIGH
-  if (symptoms.includes('breathing')) {
-    return { level: 'HIGH', en: 'Breathing difficulty needs immediate attention.', hi: 'सांस की तकलीफ पर तुरंत ध्यान दें।' };
-  }
-
-  // Rule 2: Severe symptoms
-  if (severity === 'severe') {
-    return { level: 'HIGH', en: 'Severe symptoms need urgent care.', hi: 'गंभीर लक्षणों पर तुरंत ध्यान दें।' };
-  }
-
-  // Rule 3: Took medicine but still not better
-  if (medicineTaken !== 'none' && medicineTaken !== null && severity !== 'mild') {
-    return { level: 'HIGH', en: 'Not improving despite medicine. See a doctor.', hi: 'दवा लेने के बाद भी आराम नहीं। डॉक्टर से मिलें।' };
-  }
-
-  // Rule 4: Elderly (60+) with fever
-  if (ageGroup === 'above60' && symptoms.includes('fever')) {
-    return { level: 'HIGH', en: 'Fever in elderly needs urgent attention.', hi: 'बुज़ुर्गों में बुखार पर तुरंत ध्यान दें।' };
-  }
-
-  // Rule 5: Existing conditions with fever
-  if (hasCondition === 'yes' && symptoms.includes('fever')) {
-    return { level: 'HIGH', en: 'Fever with existing conditions needs doctor visit.', hi: 'पुरानी बीमारी के साथ बुखार - डॉक्टर से मिलें।' };
-  }
-
-  // Rule 6: Children with fever
-  if (ageGroup === 'below18' && symptoms.includes('fever')) {
-    return { level: 'HIGH', en: 'Fever in children needs quick attention.', hi: 'बच्चों में बुखार पर जल्दी ध्यान दें।' };
-  }
-
-  // ════════════════════════════════════════════════════════
-  // MEDIUM RISK (Monitor closely)
-  // ════════════════════════════════════════════════════════
-
-  // Rule 7: Moderate severity
-  if (severity === 'moderate') {
-    return { level: 'MEDIUM', en: 'Moderate symptoms. Rest and monitor.', hi: 'मध्यम लक्षण। आराम करें और ध्यान रखें।' };
-  }
-
-  // Rule 8: Symptoms lasting 3+ days
-  if (duration === '3-5' || duration === 'more5') {
-    return { level: 'MEDIUM', en: 'Symptoms lasting several days. Monitor closely.', hi: 'कई दिनों से लक्षण हैं। ध्यान से देखें।' };
-  }
-
-  // Rule 9: Vomiting + Diarrhea (dehydration risk)
-  if (symptoms.includes('vomiting') && symptoms.includes('diarrhea')) {
-    return { level: 'MEDIUM', en: 'Risk of dehydration. Stay hydrated.', hi: 'पानी की कमी का खतरा। पानी पीते रहें।' };
-  }
-
-  // Rule 10: Multiple symptoms (3+)
-  if (symptoms.length >= 3) {
-    return { level: 'MEDIUM', en: 'Multiple symptoms. Consider seeing a doctor.', hi: 'कई लक्षण हैं। डॉक्टर से मिलने पर विचार करें।' };
-  }
-
-  // Rule 11: Medicine taken but symptoms persist
-  if (medicineTaken !== 'none' && medicineTaken !== null && duration !== 'today') {
-    return { level: 'MEDIUM', en: 'Symptoms persist despite medicine. Keep monitoring.', hi: 'दवा के बाद भी लक्षण हैं। निगरानी जारी रखें।' };
-  }
-
-  // ════════════════════════════════════════════════════════
-  // LOW RISK (Home care should help)
-  // ════════════════════════════════════════════════════════
-
-  return { level: 'LOW', en: 'Mild symptoms. Rest and home care should help.', hi: 'हल्के लक्षण। आराम और घरेलू देखभाल से ठीक होना चाहिए।' };
-}
-
-// Content translations
+// Content translations 182
 const content = {
   en: {
     why: 'Why this result?',
@@ -129,7 +59,14 @@ export default function Result() {
 
     if (symptomsData && ageGroup && duration && hasCondition) {
       const symptoms = JSON.parse(symptomsData);
-      const triageResult = getTriage(symptoms, ageGroup, duration, hasCondition, severity, medicineTaken);
+      // const triageResult = getTriage(symptoms, ageGroup, duration, hasCondition, severity, medicineTaken);
+      const triageResult = runTriage({
+        symptoms,
+        ageGroup,
+        duration,
+        severity,
+        medicineTaken
+      });
       setResult(triageResult);
       localStorage.setItem('swasth-result', JSON.stringify(triageResult));
     }
@@ -242,7 +179,7 @@ export default function Result() {
         {result && (
           <div className="bg-white p-5 rounded-2xl shadow-sm">
             <h3 className="font-semibold text-gray-800 mb-2">{t.why}</h3>
-            <p className="text-gray-600">{result[language]}</p>
+            <p className="text-gray-600">{result.reason?.[language]}</p> 
           </div>
         )}
 

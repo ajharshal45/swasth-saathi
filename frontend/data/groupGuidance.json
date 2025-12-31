@@ -1,0 +1,235 @@
+{
+  "infection": {
+    "en": {
+      "title": "Infection-related Symptoms",
+      "care": [
+        "Drink warm fluids",
+        "Take adequate rest",
+        "Monitor body temperature",
+        "Avoid cold exposure"
+      ],
+      "warning": [
+        "Fever lasting more than 3 days",
+        "Breathing difficulty",
+        "Extreme weakness"
+      ]
+    },
+    "hi": {
+      "title": "संक्रमण से जुड़े लक्षण",
+      "care": [
+        "गर्म तरल लें",
+        "पूरा आराम करें",
+        "तापमान पर नज़र रखें",
+        "ठंड से बचें"
+      ],
+      "warning": [
+        "3 दिन से अधिक बुखार",
+        "सांस की तकलीफ",
+        "अत्यधिक कमजोरी"
+      ]
+    }
+  },
+
+  "digestive": {
+    "en": {
+      "title": "Digestive Symptoms",
+      "care": [
+        "Take ORS or fluids frequently",
+        "Eat light and soft food",
+        "Avoid oily or spicy meals"
+      ],
+      "warning": [
+        "Unable to drink fluids",
+        "Persistent vomiting",
+        "Signs of dehydration"
+      ]
+    },
+    "hi": {
+      "title": "पाचन संबंधी लक्षण",
+      "care": [
+        "ORS या तरल बार-बार लें",
+        "हल्का भोजन करें",
+        "तेल-मसाले से बचें"
+      ],
+      "warning": [
+        "पानी न पी पाना",
+        "लगातार उल्टी",
+        "पानी की कमी के लक्षण"
+      ]
+    }
+  },
+
+  "breathing": {
+    "en": {
+      "title": "Breathing Problems",
+      "care": [
+        "Sit upright",
+        "Avoid physical exertion",
+        "Stay away from smoke"
+      ],
+      "warning": [
+        "Breathing worsens",
+        "Chest pain",
+        "Bluish lips or nails"
+      ]
+    },
+    "hi": {
+      "title": "सांस की समस्या",
+      "care": [
+        "सीधे बैठें",
+        "मेहनत न करें",
+        "धुएं से दूर रहें"
+      ],
+      "warning": [
+        "सांस और बिगड़े",
+        "सीने में दर्द",
+        "होंठ या नाखून नीले पड़ना"
+      ]
+    }
+  },
+
+  "pain": {
+    "en": {
+      "title": "Body Pain & Aches",
+      "care": [
+        "Rest affected body parts",
+        "Use warm compress if helpful",
+        "Avoid heavy physical work"
+      ],
+      "warning": [
+        "Pain increasing",
+        "Swelling or redness",
+        "Pain limiting movement"
+      ]
+    },
+    "hi": {
+      "title": "शरीर में दर्द",
+      "care": [
+        "दर्द वाले हिस्से को आराम दें",
+        "गर्म सिकाई करें",
+        "भारी काम से बचें"
+      ],
+      "warning": [
+        "दर्द बढ़ना",
+        "सूजन या लालिमा",
+        "हिलने-डुलने में परेशानी"
+      ]
+    }
+  },
+
+  "urinary": {
+    "en": {
+      "title": "Urinary Symptoms",
+      "care": [
+        "Drink adequate water",
+        "Maintain hygiene",
+        "Avoid holding urine"
+      ],
+      "warning": [
+        "Pain increases",
+        "Fever with urinary symptoms",
+        "Blood in urine"
+      ]
+    },
+    "hi": {
+      "title": "पेशाब से जुड़ी समस्या",
+      "care": [
+        "पर्याप्त पानी पिएं",
+        "स्वच्छता बनाए रखें",
+        "पेशाब रोककर न रखें"
+      ],
+      "warning": [
+        "दर्द बढ़ना",
+        "बुखार के साथ पेशाब की समस्या",
+        "पेशाब में खून"
+      ]
+    }
+  },
+
+  "skin": {
+    "en": {
+      "title": "Skin-related Symptoms",
+      "care": [
+        "Keep skin clean and dry",
+        "Avoid scratching",
+        "Use mild soaps"
+      ],
+      "warning": [
+        "Rash spreading",
+        "Severe itching",
+        "Signs of infection"
+      ]
+    },
+    "hi": {
+      "title": "त्वचा से जुड़े लक्षण",
+      "care": [
+        "त्वचा को साफ और सूखा रखें",
+        "खुजलाने से बचें",
+        "हल्के साबुन का प्रयोग करें"
+      ],
+      "warning": [
+        "चकत्ते फैलना",
+        "अधिक खुजली",
+        "संक्रमण के लक्षण"
+      ]
+    }
+  },
+
+  "neuro": {
+    "en": {
+      "title": "Neurological Symptoms",
+      "care": [
+        "Rest in a safe place",
+        "Avoid driving or heavy work",
+        "Ensure supervision if needed"
+      ],
+      "warning": [
+        "Confusion increases",
+        "Loss of balance",
+        "Sudden vision problems"
+      ]
+    },
+    "hi": {
+      "title": "तंत्रिका तंत्र से जुड़े लक्षण",
+      "care": [
+        "सुरक्षित जगह पर आराम करें",
+        "वाहन न चलाएं",
+        "ज़रूरत हो तो निगरानी रखें"
+      ],
+      "warning": [
+        "भ्रम बढ़ना",
+        "संतुलन बिगड़ना",
+        "अचानक दृष्टि समस्या"
+      ]
+    }
+  },
+
+  "general": {
+    "en": {
+      "title": "General Weakness & Fatigue",
+      "care": [
+        "Get adequate sleep",
+        "Eat nutritious food",
+        "Avoid overexertion"
+      ],
+      "warning": [
+        "Weakness worsening",
+        "Frequent dizziness",
+        "Fainting"
+      ]
+    },
+    "hi": {
+      "title": "सामान्य कमजोरी",
+      "care": [
+        "पर्याप्त नींद लें",
+        "पोषक भोजन करें",
+        "अधिक मेहनत से बचें"
+      ],
+      "warning": [
+        "कमजोरी बढ़ना",
+        "बार-बार चक्कर आना",
+        "बेहोशी"
+      ]
+    }
+  }
+}
