@@ -78,6 +78,30 @@ const withPWA = require('next-pwa')({
       },
     },
     {
+      // Cache doctor page
+      urlPattern: /^\/doctor$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 24 * 60 * 60,
+        },
+      },
+    },
+    {
+      // Cache JSON data files (symptom groups, triage rules, etc.)
+      urlPattern: /\.json$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'data-cache',
+        expiration: {
+          maxEntries: 20,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+        },
+      },
+    },
+    {
       // Cache all Next.js static assets (JS, CSS chunks)
       urlPattern: /\/_next\/static\/.*/,
       handler: 'CacheFirst',

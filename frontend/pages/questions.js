@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
+import Link from 'next/link';
 
-// Age group options
-const ageGroups = [
-  { id: 'below18', en: 'Below 18', hi: '18 से कम' },
-  { id: '18-40', en: '18 - 40', hi: '18 - 40' },
-  { id: '41-60', en: '41 - 60', hi: '41 - 60' },
-  { id: 'above60', en: 'Above 60', hi: '60 से ऊपर' },
-];
+// Helper function to get age group from age number
+const getAgeGroup = (age) => {
+  const ageNum = parseInt(age);
+  if (isNaN(ageNum) || ageNum < 0) return null;
+  if (ageNum < 18) return 'below18';
+  if (ageNum <= 40) return '18-40';
+  if (ageNum <= 60) return '41-60';
+  return 'above60';
+};
 
 // Duration options
 const durationOptions = [
@@ -42,7 +46,9 @@ const medicineOptions = [
 const content = {
   en: {
     title: 'A Few Questions',
-    ageQuestion: 'What is your age group?',
+    ageQuestion: 'What is your age?',
+    agePlaceholder: 'Enter your age',
+    ageHint: 'Years',
     durationQuestion: 'How long have you had these symptoms?',
     conditionQuestion: 'Do you have any existing health conditions?',
     conditionHint: '(Diabetes, BP, Heart disease, etc.)',
@@ -56,6 +62,8 @@ const content = {
   hi: {
     title: 'कुछ सवाल',
     ageQuestion: 'आपकी उम्र क्या है?',
+    agePlaceholder: 'अपनी उम्र दर्ज करें',
+    ageHint: 'वर्ष',
     durationQuestion: 'ये लक्षण कितने दिनों से हैं?',
     conditionQuestion: 'क्या कोई पुरानी बीमारी है?',
     conditionHint: '(मधुमेह, BP, हृदय रोग आदि)',
@@ -72,7 +80,7 @@ export default function Questions() {
   const router = useRouter();
   const [language, setLanguage] = useState('en');
   const [isOnline, setIsOnline] = useState(true);
-  const [ageGroup, setAgeGroup] = useState(null);
+  const [age, setAge] = useState('');
   const [duration, setDuration] = useState(null);
   const [hasCondition, setHasCondition] = useState(null);
   const [severity, setSeverity] = useState(null);
@@ -110,11 +118,13 @@ export default function Questions() {
 
   // Handle form submission
   const handleSubmit = () => {
-    if (!ageGroup || !duration || !hasCondition || !severity || !medicineTaken) {
+    const ageGroup = getAgeGroup(age);
+    if (!age || !ageGroup || !duration || !hasCondition || !severity || !medicineTaken) {
       alert(content[language].required);
       return;
     }
 
+    localStorage.setItem('swasth-age', age);
     localStorage.setItem('swasth-ageGroup', ageGroup);
     localStorage.setItem('swasth-duration', duration);
     localStorage.setItem('swasth-conditions', hasCondition);
@@ -124,178 +134,269 @@ export default function Questions() {
   };
 
   const t = content[language];
-  const isComplete = ageGroup && duration && hasCondition && severity && medicineTaken;
+  const isComplete = age && getAgeGroup(age) && duration && hasCondition && severity && medicineTaken;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50 to-white">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push('/symptoms')}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm text-gray-600 hover:bg-gray-50"
-          >
-            ←
-          </button>
-          <h1 className="font-bold text-lg">{t.title}</h1>
-        </div>
-        <div className="flex items-center gap-3 text-sm">
-          {/* Language Toggle */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => toggleLanguage('en')}
-              className={`px-2 py-1 rounded ${
-                language === 'en' ? 'bg-green-600 text-white' : 'text-gray-600'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => toggleLanguage('hi')}
-              className={`px-2 py-1 rounded ${
-                language === 'hi' ? 'bg-green-600 text-white' : 'text-gray-600'
-              }`}
-            >
-              हिंदी
-            </button>
-          </div>
-          {/* Network Badge */}
-          <div
-            className={`px-3 py-1 rounded-full font-medium ${
-              isOnline ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
-            }`}
-          >
-            {isOnline ? `🟢 ${t.online}` : `🔴 ${t.offline}`}
-          </div>
-        </div>
-      </header>
+    <>
+      <Head>
+        <title>{t.title} - Swasth Saathi</title>
+      </Head>
 
-      {/* Form Content */}
-      <div className="flex-1 p-4 space-y-6 overflow-auto">
-        {/* Age Group Question */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-gray-800 font-semibold mb-1">{t.ageQuestion}</p>
-          {language === 'en' && <p className="text-gray-500 text-sm mb-3">(आपकी उम्र क्या है?)</p>}
-          {language === 'hi' && <p className="text-gray-500 text-sm mb-3">(What is your age group?)</p>}
-          <div className="space-y-2">
-            {ageGroups.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setAgeGroup(option.id)}
-                className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
-                  ageGroup === option.id
-                    ? 'border-green-500 bg-green-100 shadow-sm'
-                    : 'border-gray-100 bg-gray-50 hover:border-green-300'
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-18 flex items-center justify-between">
+            {/* Left: Back + Title */}
+            <div className="flex items-center gap-3">
+              <Link
+                href="/symptoms"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-600 transition-all text-sm font-medium"
+              >
+                ←
+              </Link>
+              <div className="leading-tight">
+                <h1 className="text-sm font-bold text-slate-900">{t.title}</h1>
+                <p className="text-xs text-slate-500">
+                  {language === 'en' ? 'These help us understand your health risk better' : 'ये हमें आपके स्वास्थ्य जोखिम को बेहतर समझने में मदद करते हैं'}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Language Toggle + Status */}
+            <div className="flex items-center gap-2">
+              {/* Language Toggle */}
+              <div className="flex rounded-full overflow-hidden border border-slate-200 text-xs font-semibold">
+                <button
+                  onClick={() => toggleLanguage('en')}
+                  className={`px-3 py-1.5 transition-all ${
+                    language === 'en'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white text-slate-500 hover:bg-slate-50'
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => toggleLanguage('hi')}
+                  className={`px-3 py-1.5 transition-all ${
+                    language === 'hi'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white text-slate-500 hover:bg-slate-50'
+                  }`}
+                >
+                  हिंदी
+                </button>
+              </div>
+
+              {/* Network Badge */}
+              <div
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium ${
+                  isOnline
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-red-50 text-red-600 border border-red-200'
                 }`}
               >
-                <span className={ageGroup === option.id ? 'text-green-800 font-medium' : 'text-gray-700'}>{option[language]}</span>
-              </button>
-            ))}
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    isOnline ? 'bg-emerald-500' : 'bg-red-500'
+                  }`}
+                />
+                {isOnline ? t.online : t.offline}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Form Content */}
+        <main className="flex-1 max-w-2xl mx-auto w-full px-4 pt-4 pb-32 space-y-3">
+        {/* Age Question */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="w-full px-4 py-3 flex items-center justify-between">
+            <div className="text-left">
+              <div className="text-sm font-bold text-slate-800">{t.ageQuestion}</div>
+              <div className="text-xs text-slate-500">
+                {language === 'en' ? '(आपकी उम्र क्या है?)' : '(What is your age?)'}
+              </div>
+            </div>
+            
+          </div>
+          <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100">
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                min="0"
+                max="120"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder={t.agePlaceholder}
+                className="flex-1 p-3 rounded-lg border-2 border-slate-200 bg-white text-slate-800 text-sm font-medium outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
+              />
+              <span className="text-xs font-medium text-slate-500">{t.ageHint}</span>
+            </div>
+            {age && getAgeGroup(age) && (
+              <div className="mt-2 text-xs text-emerald-600 font-medium">
+                ✓ {language === 'en' ? 'Age recorded' : 'उम्र दर्ज की गई'}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Duration Question */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-gray-800 font-semibold mb-1">{t.durationQuestion}</p>
-          {language === 'en' && <p className="text-gray-500 text-sm mb-3">(ये लक्षण कितने दिनों से हैं?)</p>}
-          {language === 'hi' && <p className="text-gray-500 text-sm mb-3">(How long have you had these symptoms?)</p>}
-          <div className="space-y-2">
-            {durationOptions.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setDuration(option.id)}
-                className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
-                  duration === option.id
-                    ? 'border-green-500 bg-green-100 shadow-sm'
-                    : 'border-gray-100 bg-gray-50 hover:border-green-300'
-                }`}
-              >
-                <span className={duration === option.id ? 'text-green-800 font-medium' : 'text-gray-700'}>{option[language]}</span>
-              </button>
-            ))}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            <div className="text-left">
+              <div className="text-sm font-bold text-slate-800">{t.durationQuestion}</div>
+              <div className="text-xs text-slate-500">
+                {language === 'en' ? '(ये लक्षण कितने दिनों से हैं?)' : '(How long have you had these symptoms?)'}
+              </div>
+            </div>
+            
+          </button>
+          <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100">
+            <div className="grid grid-cols-2 gap-2">
+              {durationOptions.map((option) => {
+                const sel = duration === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setDuration(option.id)}
+                    className={`p-3 rounded-lg border-2 text-center transition-all ${
+                      sel
+                        ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <span className="text-xs font-medium">{option[language]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Existing Conditions Question */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-gray-800 font-semibold mb-1">{t.conditionQuestion}</p>
-          <p className="text-gray-500 text-sm mb-3">{t.conditionHint}</p>
-          <div className="space-y-2">
-            {conditionOptions.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setHasCondition(option.id)}
-                className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
-                  hasCondition === option.id
-                    ? 'border-green-500 bg-green-100 shadow-sm'
-                    : 'border-gray-100 bg-gray-50 hover:border-green-300'
-                }`}
-              >
-                <span className={hasCondition === option.id ? 'text-green-800 font-medium' : 'text-gray-700'}>{option[language]}</span>
-              </button>
-            ))}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            <div className="text-left">
+              <div className="text-sm font-bold text-slate-800">{t.conditionQuestion}</div>
+              <div className="text-xs text-slate-500">{t.conditionHint}</div>
+            </div>
+            
+          </button>
+          <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100">
+            <div className="grid grid-cols-2 gap-2">
+              {conditionOptions.map((option) => {
+                const sel = hasCondition === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setHasCondition(option.id)}
+                    className={`p-3 rounded-lg border-2 text-center transition-all ${
+                      sel
+                        ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <span className="text-xs font-medium">{option[language]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Severity Question (NEW) */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-gray-800 font-semibold mb-1">{t.severityQ}</p>
-          {language === 'en' && <p className="text-gray-500 text-sm mb-3">(आप अभी कितना बुरा महसूस कर रहे हैं?)</p>}
-          {language === 'hi' && <p className="text-gray-500 text-sm mb-3">(How bad do you feel right now?)</p>}
-          <div className="space-y-2">
-            {severityOptions.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setSeverity(option.id)}
-                className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
-                  severity === option.id
-                    ? 'border-green-500 bg-green-100 shadow-sm'
-                    : 'border-gray-100 bg-gray-50 hover:border-green-300'
-                }`}
-              >
-                <span className={severity === option.id ? 'text-green-800 font-medium' : 'text-gray-700'}>{option[language]}</span>
-              </button>
-            ))}
+        {/* Severity Question */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            <div className="text-left">
+              <div className="text-sm font-bold text-slate-800">{t.severityQ}</div>
+              <div className="text-xs text-slate-500">
+                {language === 'en' ? '(आप अभी कितना बुरा महसूस कर रहे हैं?)' : '(How bad do you feel right now?)'}
+              </div>
+            </div>
+            
+          </button>
+          <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100">
+            <div className="grid grid-cols-1 gap-2">
+              {severityOptions.map((option) => {
+                const sel = severity === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setSeverity(option.id)}
+                    className={`p-3 rounded-lg border-2 text-center transition-all ${
+                      sel
+                        ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <span className="text-xs font-medium">{option[language]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Medicine Question (NEW) */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-gray-800 font-semibold mb-1">{t.medicineQ}</p>
-          {language === 'en' && <p className="text-gray-500 text-sm mb-3">(क्या आपने पहले से कोई दवा ली है?)</p>}
-          {language === 'hi' && <p className="text-gray-500 text-sm mb-3">(Have you taken any medicine already?)</p>}
-          <div className="space-y-2">
-            {medicineOptions.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setMedicineTaken(option.id)}
-                className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
-                  medicineTaken === option.id
-                    ? 'border-green-500 bg-green-100 shadow-sm'
-                    : 'border-gray-100 bg-gray-50 hover:border-green-300'
-                }`}
-              >
-                <span className={medicineTaken === option.id ? 'text-green-800 font-medium' : 'text-gray-700'}>{option[language]}</span>
-              </button>
-            ))}
+        {/* Medicine Question */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            <div className="text-left">
+              <div className="text-sm font-bold text-slate-800">{t.medicineQ}</div>
+              <div className="text-xs text-slate-500">
+                {language === 'en' ? '(क्या आपने पहले से कोई दवा ली है?)' : '(Have you taken any medicine already?)'}
+              </div>
+            </div>
+            
+          </button>
+          <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100">
+            <div className="grid grid-cols-1 gap-2">
+              {medicineOptions.map((option) => {
+                const sel = medicineTaken === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setMedicineTaken(option.id)}
+                    className={`p-3 rounded-lg border-2 text-center transition-all ${
+                      sel
+                        ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <span className="text-xs font-medium">{option[language]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+        </div>
+      </main>
+
+      {/* Bottom Bar - Fixed */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          {/* Selected Count */}
+          {isComplete && (
+            <div className="mb-3 py-2 bg-emerald-100 text-emerald-700 text-center text-sm font-medium rounded-lg">
+              ✓ {language === 'en' ? 'All questions answered' : 'सभी सवालों के जवाब दिए गए'}
+            </div>
+          )}
+
+          {/* Continue Button */}
+          <button
+            onClick={handleSubmit}
+            disabled={!isComplete}
+            className={`w-full py-3.5 rounded-xl font-bold text-base transition-all ${
+              isComplete
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg active:scale-[0.98]'
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            }`}
+          >
+            {t.submit} →
+          </button>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="p-4 pt-2">
-        <button
-          onClick={handleSubmit}
-          disabled={!isComplete}
-          className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
-            isComplete
-              ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {t.submit}
-        </button>
       </div>
-    </div>
+    </>
   );
 }

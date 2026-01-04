@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Test - Swasth Saathi</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 { color: #16a34a; margin-top: 0; }
+    h2 { color: #374151; font-size: 18px; margin-top: 0; }
+    .status { 
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .online { background: #d1fae5; color: #065f46; }
+    .offline { background: #fee2e2; color: #991b1b; }
+    .test-item {
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pass { border-left: 4px solid #10b981; }
+    .fail { border-left: 4px solid #ef4444; }
+    .pending { border-left: 4px solid #f59e0b; }
+    button {
+      background: #16a34a;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #15803d; }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.pass { background: #d1fae5; color: #065f46; }
+    .badge.fail { background: #fee2e2; color: #991b1b; }
+    .badge.pending { background: #fef3c7; color: #92400e; }
+    code {
+      background: #1f2937;
+      color: #10b981;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🏥 Swasth Saathi - Offline Test</h1>
+    <div id="network-status" class="status">Checking...</div>
+    <p>This page tests if the app is properly configured for offline functionality.</p>
+  </div>
+
+  <div class="card">
+    <h2>Service Worker Status</h2>
+    <div id="sw-tests"></div>
+  </div>
+
+  <div class="card">
+    <h2>Cache Storage</h2>
+    <div id="cache-tests"></div>
+    <button onclick="listCaches()" style="margin-top: 12px;">🔍 List All Caches</button>
+  </div>
+
+  <div class="card">
+    <h2>LocalStorage</h2>
+    <div id="storage-tests"></div>
+    <button onclick="testLocalStorage()" style="margin-top: 12px;">💾 Test LocalStorage</button>
+  </div>
+
+  <div class="card">
+    <h2>Navigation Test</h2>
+    <p>Visit these pages while online, then go offline and try them again:</p>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
+      <a href="/" style="text-decoration: none;">
+        <button>🏠 Home</button>
+      </a>
+      <a href="/symptoms" style="text-decoration: none;">
+        <button>🩺 Symptoms</button>
+      </a>
+      <a href="/questions" style="text-decoration: none;">
+        <button>❓ Questions</button>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Update network status
+    function updateNetworkStatus() {
+      const statusDiv = document.getElementById('network-status');
+      const isOnline = navigator.onLine;
+      statusDiv.className = 'status ' + (isOnline ? 'online' : 'offline');
+      statusDiv.innerHTML = isOnline 
+        ? '🟢 Online - Service Worker will cache resources'
+        : '🔴 Offline - Testing cached resources';
+    }
+
+    // Test service worker
+    async function testServiceWorker() {
+      const container = document.getElementById('sw-tests');
+      const tests = [];
+
+      // Test 1: Service Worker API available
+      tests.push({
+        name: 'Service Worker API Available',
+        status: 'serviceWorker' in navigator ? 'pass' : 'fail',
+        message: 'serviceWorker' in navigator 
+          ? 'navigator.serviceWorker is supported'
+          : 'Browser does not support service workers'
+      });
+
+      // Test 2: Service Worker registered
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration();
+          tests.push({
+            name: 'Service Worker Registered',
+            status: registration ? 'pass' : 'pending',
+            message: registration 
+              ? `Registered at scope: ${registration.scope}`
+              : 'No service worker registered yet. Build in production mode.'
+          });
+
+          // Test 3: Service Worker active
+          if (registration) {
+            tests.push({
+              name: 'Service Worker Active',
+              status: registration.active ? 'pass' : 'pending',
+              message: registration.active 
+                ? `State: ${registration.active.state}`
+                : 'Service worker is installing or waiting'
+            });
+          }
+        } catch (e) {
+          tests.push({
+            name: 'Service Worker Registration',
+            status: 'fail',
+            message: `Error: ${e.message}`
+          });
+        }
+      }
+
+      // Render tests
+      container.innerHTML = tests.map(test => `
+        <div class="test-item ${test.status}">
+          <div>
+            <strong>${test.name}</strong><br>
+            <small style="color: #6b7280;">${test.message}</small>
+          </div>
+          <span class="badge ${test.status}">
+            ${test.status === 'pass' ? '✓' : test.status === 'fail' ? '✗' : '⏳'}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // Test cache storage
+    async function testCacheStorage() {
+      const container = document.getElementById('cache-tests');
+      const tests = [];
+
+      // Test 1: Cache API available
+      tests.push({
+        name: 'Cache Storage API Available',
+        status: 'caches' in window ? 'pass' : 'fail',
+        message: 'caches' in window 
+          ? 'Cache Storage API is supported'
+          : 'Browser does not support Cache Storage'
+      });
+
+      // Test 2: Check for caches
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          tests.push({
+            name: 'Caches Created',
+            status: cacheNames.length > 0 ? 'pass' : 'pending',
+            message: cacheNames.length > 0 
+              ? `${cacheNames.length} cache(s) found: ${cacheNames.join(', ')}`
+              : 'No caches yet. Visit pages while online to cache them.'
+          });
+        } catch (e) {
+          tests.push({
+            name: 'Cache Check',
+            status: 'fail',
+            message: `Error: ${e.message}`
+          });
+        }
+      }
+
+      container.innerHTML = tests.map(test => `
+        <div class="test-item ${test.status}">
+          <div>
+            <strong>${test.name}</strong><br>
+            <small style="color: #6b7280;">${test.message}</small>
+          </div>
+          <span class="badge ${test.status}">
+            ${test.status === 'pass' ? '✓' : test.status === 'fail' ? '✗' : '⏳'}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // List all caches
+    async function listCaches() {
+      if (!('caches' in window)) {
+        alert('Cache Storage not supported');
+        return;
+      }
+
+      const cacheNames = await caches.keys();
+      let output = `Found ${cacheNames.length} cache(s):\n\n`;
+
+      for (const name of cacheNames) {
+        const cache = await caches.open(name);
+        const keys = await cache.keys();
+        output += `📦 ${name} (${keys.length} items)\n`;
+        keys.slice(0, 5).forEach(req => {
+          output += `  • ${new URL(req.url).pathname}\n`;
+        });
+        if (keys.length > 5) {
+          output += `  ... and ${keys.length - 5} more\n`;
+        }
+        output += '\n';
+      }
+
+      alert(output);
+    }
+
+    // Test localStorage
+    function testLocalStorage() {
+      const container = document.getElementById('storage-tests');
+      const tests = [];
+
+      // Test 1: localStorage available
+      const hasLocalStorage = typeof localStorage !== 'undefined';
+      tests.push({
+        name: 'LocalStorage API Available',
+        status: hasLocalStorage ? 'pass' : 'fail',
+        message: hasLocalStorage 
+          ? 'localStorage is supported'
+          : 'localStorage is not available'
+      });
+
+      // Test 2: Check for Swasth Saathi data
+      if (hasLocalStorage) {
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('swasth-'));
+        tests.push({
+          name: 'Swasth Saathi Data',
+          status: keys.length > 0 ? 'pass' : 'pending',
+          message: keys.length > 0 
+            ? `${keys.length} item(s) stored: ${keys.join(', ')}`
+            : 'No data yet. Use the app to store data.'
+        });
+
+        // Test 3: Write test
+        try {
+          localStorage.setItem('swasth-test', 'offline-test');
+          const value = localStorage.getItem('swasth-test');
+          localStorage.removeItem('swasth-test');
+          
+          tests.push({
+            name: 'LocalStorage Write/Read',
+            status: value === 'offline-test' ? 'pass' : 'fail',
+            message: value === 'offline-test'
+              ? 'Successfully wrote and read data'
+              : 'Failed to read written data'
+          });
+        } catch (e) {
+          tests.push({
+            name: 'LocalStorage Write/Read',
+            status: 'fail',
+            message: `Error: ${e.message}`
+          });
+        }
+      }
+
+      container.innerHTML = tests.map(test => `
+        <div class="test-item ${test.status}">
+          <div>
+            <strong>${test.name}</strong><br>
+            <small style="color: #6b7280;">${test.message}</small>
+          </div>
+          <span class="badge ${test.status}">
+            ${test.status === 'pass' ? '✓' : test.status === 'fail' ? '✗' : '⏳'}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // Run tests on load
+    updateNetworkStatus();
+    testServiceWorker();
+    testCacheStorage();
+    testLocalStorage();
+
+    // Listen for network changes
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+  </script>
+</body>
+</html>
