@@ -455,6 +455,12 @@ export default function Symptoms() {
   const [isOnline, setIsOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
   
+  // Voice recognition state
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceDetectedSymptoms, setVoiceDetectedSymptoms] = useState([]);
+  
   // Step management: 'symptoms' | 'followup'
   const [step, setStep] = useState('symptoms');
   
@@ -494,6 +500,13 @@ export default function Symptoms() {
   // Mount animation
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Check voice recognition support
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setVoiceSupported('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+    }
   }, []);
 
   // Load saved language preference
@@ -554,12 +567,133 @@ export default function Symptoms() {
     localStorage.setItem('swasth-symptoms', JSON.stringify(selected));
   }, [selected]);
 
-  // Handle voice input (demo)
+  // Handle voice input with Web Speech API
   const handleVoice = () => {
-    const msg = language === 'en'
-      ? '🎤 Voice Input Demo\n\nThis feature would listen to you describe symptoms in Hindi or English.\n\n(Prototype - not functional)'
-      : '🎤 वॉइस इनपुट डेमो\n\nयह सुविधा आपके लक्षण सुनेगी।\n\n(प्रोटोटाइप - काम नहीं करता)';
-    alert(msg);
+    if (!voiceSupported) {
+      alert(language === 'en' 
+        ? 'Voice input not supported in this browser. Try Chrome or Edge.'
+        : 'इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है। Chrome या Edge आज़माएं।');
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    // Symptom keywords mapping (English and Hindi transliterated)
+    const symptomKeywords = {
+      // English keywords
+      'fever': 'fever', 'temperature': 'fever', 'hot': 'fever', 'feverish': 'fever',
+      'cough': 'cough', 'coughing': 'cough',
+      'cold': 'cold', 'runny nose': 'runnyNose', 'nose running': 'runnyNose',
+      'headache': 'headache', 'head pain': 'headache', 'head hurts': 'headache', 'head ache': 'headache',
+      'breathing': 'breathing', 'breathe': 'breathing', 'breath': 'breathing', 'breathless': 'breathing',
+      'stomach': 'stomach', 'tummy': 'stomach', 'belly': 'stomach', 'stomach pain': 'stomach', 'stomach ache': 'stomach',
+      'vomiting': 'vomiting', 'vomit': 'vomiting', 'throwing up': 'vomiting', 'puke': 'vomiting',
+      'diarrhea': 'diarrhea', 'loose motion': 'diarrhea', 'loose stool': 'diarrhea', 'diarrhoea': 'diarrhea',
+      'weakness': 'weakness', 'weak': 'weakness', 'tired': 'fatigue', 'tiredness': 'fatigue', 'fatigue': 'fatigue',
+      'body pain': 'bodyPain', 'body ache': 'bodyPain', 'aching': 'bodyPain',
+      'chills': 'chills', 'shivering': 'chills',
+      'sore throat': 'soreThroat', 'throat pain': 'soreThroat', 'throat hurts': 'soreThroat',
+      'nausea': 'nausea', 'nauseous': 'nausea', 'feel sick': 'nausea',
+      'dizzy': 'dizziness', 'dizziness': 'dizziness', 'giddiness': 'dizziness',
+      'chest': 'chestTightness', 'chest pain': 'chestTightness', 'chest tight': 'chestTightness',
+      'joint pain': 'jointPain', 'joints': 'jointPain', 'joint ache': 'jointPain',
+      'back pain': 'backPain', 'back ache': 'backPain',
+      'rash': 'rash', 'skin rash': 'rash', 'itching': 'itching', 'itchy': 'itching',
+      'anxiety': 'anxiety', 'anxious': 'anxiety', 'worried': 'anxiety',
+      'sleep': 'sleepIssues', 'insomnia': 'sleepIssues', 'cant sleep': 'sleepIssues',
+      
+      // Hindi (transliterated) keywords
+      'bukhar': 'fever', 'bukhaar': 'fever', 'taap': 'fever',
+      'khansi': 'cough', 'khaansi': 'cough', 'khaasi': 'cough',
+      'sardi': 'cold', 'jukam': 'cold', 'jukaam': 'cold',
+      'sir dard': 'headache', 'sar dard': 'headache', 'sirdard': 'headache',
+      'sans': 'breathing', 'saans': 'breathing', 'dam': 'breathing',
+      'pet': 'stomach', 'pet dard': 'stomach', 'pet me dard': 'stomach',
+      'ulti': 'vomiting', 'ultee': 'vomiting',
+      'dast': 'diarrhea', 'daast': 'diarrhea', 'loose motion': 'diarrhea',
+      'kamzori': 'weakness', 'kamzor': 'weakness', 'thakan': 'fatigue',
+      'badan dard': 'bodyPain', 'body dard': 'bodyPain',
+      'thandi': 'chills', 'kampkampi': 'chills',
+      'gala': 'soreThroat', 'gala dard': 'soreThroat', 'gale me dard': 'soreThroat',
+      'chakkar': 'dizziness', 'ghoomna': 'dizziness',
+      'seena': 'chestTightness', 'chhati': 'chestTightness',
+      'jod dard': 'jointPain', 'jodon me dard': 'jointPain',
+      'peeth dard': 'backPain', 'kamar dard': 'backPain',
+      'khujli': 'itching', 'daane': 'rash',
+      'ghabrahat': 'anxiety', 'chinta': 'anxiety',
+      'neend': 'sleepIssues', 'nind': 'sleepIssues',
+    };
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setTranscript('');
+      setVoiceDetectedSymptoms([]);
+    };
+
+    recognition.onresult = (event) => {
+      const current = event.resultIndex;
+      const result = event.results[current][0].transcript.toLowerCase();
+      setTranscript(result);
+      
+      // Find matching symptoms
+      const detected = [];
+      Object.entries(symptomKeywords).forEach(([keyword, symptomId]) => {
+        if (result.includes(keyword)) {
+          if (!selected.includes(symptomId) && !detected.includes(symptomId)) {
+            detected.push(symptomId);
+          }
+        }
+      });
+      
+      // Add detected symptoms
+      if (detected.length > 0) {
+        setVoiceDetectedSymptoms(detected);
+        setSelected(prev => {
+          const newSelected = [...prev];
+          detected.forEach(symptomId => {
+            if (!newSelected.includes(symptomId)) {
+              newSelected.push(symptomId);
+            }
+          });
+          return newSelected;
+        });
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      
+      if (event.error === 'no-speech') {
+        alert(language === 'en' 
+          ? 'No speech detected. Please try again and speak clearly.'
+          : 'कोई आवाज़ नहीं मिली। कृपया फिर से कोशिश करें।');
+      } else if (event.error === 'not-allowed') {
+        alert(language === 'en'
+          ? 'Microphone access denied. Please allow microphone permission.'
+          : 'माइक्रोफोन अनुमति नहीं दी गई। कृपया अनुमति दें।');
+      }
+    };
+
+    recognition.start();
+  };
+
+  // Get symptom name by ID
+  const getSymptomName = (symptomId) => {
+    for (const group of symptomGroups) {
+      const symptom = group.symptoms.find(s => s.id === symptomId);
+      if (symptom) return symptom[language];
+    }
+    return symptomId;
   };
 
   // Handle continue from symptoms to follow-up
@@ -748,20 +882,82 @@ export default function Symptoms() {
           <main className={`flex-1 max-w-2xl mx-auto w-full px-4 pt-4 pb-32 transition-all duration-500 ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            {/* Voice Button - Only when online */}
-            {isOnline && (
+            {/* Voice Button - Only when online and supported */}
+            {voiceSupported && isOnline && (
               <button
                 onClick={handleVoice}
-                className="w-full mb-4 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+                disabled={isListening}
+                className={`w-full mb-4 py-4 rounded-xl shadow-lg transition-all ${
+                  isListening 
+                    ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600'
+                } text-white`}
               >
                 <div className="flex items-center justify-center gap-3">
-                  <span className="text-xl">🎤</span>
+                  <span className="text-2xl">{isListening ? '🔴' : ''}</span>
                   <div className="text-left">
-                    <div className="text-sm font-bold leading-tight">{t.voice}</div>
-                    <div className="text-xs opacity-90">{t.voiceHint}</div>
+                    <div className="text-sm font-bold leading-tight">
+                      {isListening 
+                        ? (language === 'en' ? 'Listening...' : 'सुन रहा है...')
+                        : t.voice
+                      }
+                    </div>
+                    <div className="text-xs opacity-90">
+                      {isListening 
+                        ? (transcript || (language === 'en' ? 'Say: fever, cough, headache...' : 'बोलें: बुखार, खांसी, सिरदर्द...'))
+                        : t.voiceHint
+                      }
+                    </div>
                   </div>
                 </div>
               </button>
+            )}
+
+            {/* Voice Not Supported Message */}
+            {!voiceSupported && isOnline && (
+              <div className="w-full mb-4 py-3 px-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 text-sm">
+                <div className="flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{language === 'en' ? 'Voice input not available in this browser. Use Chrome for voice.' : 'इस ब्राउज़र में वॉइस उपलब्ध नहीं। Chrome का उपयोग करें।'}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Voice Detected Symptoms */}
+            {voiceDetectedSymptoms.length > 0 && (
+              <div className="w-full mb-4 py-3 px-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl">
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-600 text-lg">✓</span>
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-emerald-800 mb-1">
+                      {language === 'en' ? 'Detected from voice:' : 'आवाज़ से पहचाना गया:'}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {voiceDetectedSymptoms.map(symptomId => (
+                        <span 
+                          key={symptomId}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full"
+                        >
+                          {getSymptomName(symptomId)}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSymptom(symptomId);
+                              setVoiceDetectedSymptoms(prev => prev.filter(id => id !== symptomId));
+                            }}
+                            className="w-4 h-4 rounded-full bg-emerald-200 hover:bg-red-200 text-emerald-600 hover:text-red-600 flex items-center justify-center text-xs"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="text-xs text-emerald-600 mt-1">
+                      {language === 'en' ? '(Tap × to remove any)' : '(हटाने के लिए × दबाएं)'}
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Instruction */}

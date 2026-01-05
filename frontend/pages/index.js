@@ -189,7 +189,7 @@ export default function Home() {
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-18 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 font-black text-lg md:text-xl text-emerald-600 hover:text-emerald-700 transition-colors">
-              <span className="text-2xl">❤️</span>
+              <span className="text-2xl">   </span>
               <span>Swasth Saathi</span>
             </Link>
 
@@ -448,7 +448,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-2.5 text-white font-black text-lg">
-                <span className="text-2xl">❤️</span>
+                <span className="text-2xl">   </span>
                 <span>Swasth Saathi</span>
               </div>
               
